@@ -10,9 +10,12 @@ const pool = new Pool({
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
-pool.on('connect',async () => {
+pool.on('connect', async () => {
   console.log('PostgreSQL client connected');
   await pool.query(`
       -- Drop existing tables if they exist
