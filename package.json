@@ -2,7 +2,9 @@
   "name": "product-review-dashboard",
   "version": "1.0.0",
   "scripts": {
-    "start": "node backend/src/index.js"
+    "build": "cd backend && npm install && cd ../frontend && npm install && npm run build",
+    "start": "nodemon backend/src/index.js",
+    "postinstall": "npm run build"
   },
   "engines": {
     "node": "18.x"
