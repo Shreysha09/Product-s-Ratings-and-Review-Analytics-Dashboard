@@ -37,14 +37,14 @@ const formatCurrency = (value) => {
   return isNaN(num) ? '₹0.00' : `₹${num.toFixed(2)}`;
 };
 
-// Helper function to safely format number
-const formatNumber = (value) => {
-  if (value === null || value === undefined || isNaN(value)) {
-    return '0';
-  }
-  const num = parseFloat(value);
-  return isNaN(num) ? '0' : num.toFixed(0);
-};
+// // Helper function to safely format number
+// const formatNumber = (value) => {
+//   if (value === null || value === undefined || isNaN(value)) {
+//     return '0';
+//   }
+//   const num = parseFloat(value);
+//   return isNaN(num) ? '0' : num.toFixed(0);
+// };
 
 // Helper function to safely get discount percentage
 const getDiscountPercentage = (product) => {

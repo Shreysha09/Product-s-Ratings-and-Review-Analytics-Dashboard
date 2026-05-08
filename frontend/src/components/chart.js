@@ -7,15 +7,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  PieChart,
-  Pie,
   Cell,
-  LineChart,
-  Line,
-  Area,
-  AreaChart,
 } from 'recharts';
 import { Paper, Typography, Grid, Box, Chip, Rating } from '@mui/material';
 import { TrendingUp, Star, Category, LocalOffer } from '@mui/icons-material';
@@ -337,10 +330,10 @@ export const StatsCards = ({ stats }) => {
   const totalReviews = formatNumber(stats.total_reviews);
   const overallAvgRating = formatNumber(stats.overall_avg_rating);
   const avgDiscount = formatNumber(stats.avg_discount);
-  const positiveReviews = formatNumber(stats.positive_reviews);
-  const negativeReviews = formatNumber(stats.negative_reviews);
-  const maxDiscount = formatNumber(stats.max_discount);
-  const minDiscount = formatNumber(stats.min_discount);
+  // const positiveReviews = formatNumber(stats.positive_reviews);
+  // const negativeReviews = formatNumber(stats.negative_reviews);
+  // const maxDiscount = formatNumber(stats.max_discount);
+  // const minDiscount = formatNumber(stats.min_discount);
 
   return (
     <Grid container spacing={3} sx={{ mb: 3 }}>
