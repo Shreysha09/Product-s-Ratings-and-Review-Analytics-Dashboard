@@ -1,23 +1,28 @@
-const { Pool } = require('pg');
 require('dotenv').config();
-console.log(`jjj`)
+const { Pool } = require('pg');
+
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD + '',
-  database: process.env.DB_NAME,
+  host: 'turntable.proxy.rlwy.net',
+  port: 58605,
+  user: 'postgres',
+  password: 'lOmXAQYLkwenBcORMmjcUpJyuyEOHJgT',
+  database: 'railway',
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-  ssl: {
-    rejectUnauthorized: false,
-  },
 });
 
-pool.on('connect', async () => {
-  console.log('PostgreSQL client connected');
-  await pool.query(`
+
+// Check DB connection + initialize tables
+const initializeDatabase = async () => {
+  let client;
+
+  try {
+    client = await pool.connect();
+
+    console.log('✅ PostgreSQL Database Connected Successfully');
+
+    await client.query(`
       -- Drop existing tables if they exist
       DROP TABLE IF EXISTS reviews;
       DROP TABLE IF EXISTS products;
@@ -41,7 +46,7 @@ pool.on('connect', async () => {
           id SERIAL PRIMARY KEY,
           review_id VARCHAR(100) UNIQUE NOT NULL,
           product_id VARCHAR(100) REFERENCES products(product_id) ON DELETE CASCADE,
-          rating DECIMAL(3, 1) CHECK (rating >= 0 AND rating <= 5),
+          rating DECIMAL(3,1) CHECK (rating >= 0 AND rating <= 5),
           rating_count INTEGER DEFAULT 0,
           user_name VARCHAR(255),
           review_title VARCHAR(500),
@@ -50,57 +55,33 @@ pool.on('connect', async () => {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- Add rating columns
       ALTER TABLE products 
       ADD COLUMN IF NOT EXISTS rating DECIMAL(3,1) DEFAULT 0;
 
       ALTER TABLE products 
       ADD COLUMN IF NOT EXISTS rating_count INTEGER DEFAULT 0;
-
-      -- Indexes
-      CREATE INDEX IF NOT EXISTS idx_product_category 
-      ON products(category);
-
-      CREATE INDEX IF NOT EXISTS idx_product_name 
-      ON products(product_name);
-
-      CREATE INDEX IF NOT EXISTS idx_product_discount 
-      ON products(discount_percentage);
-
-      CREATE INDEX IF NOT EXISTS idx_review_rating 
-      ON reviews(rating);
-
-      CREATE INDEX IF NOT EXISTS idx_review_product 
-      ON reviews(product_id);
-
-      CREATE INDEX IF NOT EXISTS idx_review_created 
-      ON reviews(created_at);
-
-      -- Function for updated_at
-      CREATE OR REPLACE FUNCTION update_updated_at_column()
-      RETURNS TRIGGER AS $$
-      BEGIN
-          NEW.updated_at = CURRENT_TIMESTAMP;
-          RETURN NEW;
-      END;
-      $$ language 'plpgsql';
-
-      -- Drop trigger if exists
-      DROP TRIGGER IF EXISTS update_products_updated_at ON products;
-
-      -- Trigger
-      CREATE TRIGGER update_products_updated_at
-      BEFORE UPDATE ON products
-      FOR EACH ROW
-      EXECUTE FUNCTION update_updated_at_column();
     `);
 
-});
+    console.log('✅ Database Tables Initialized Successfully');
 
+  } catch (error) {
+    console.error('❌ Database Connection Failed');
+    console.error(error.message);
+
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
+// Run on startup
+initializeDatabase();
+
+// Handle unexpected pool errors
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+  console.error('❌ Unexpected PostgreSQL Pool Error:', err);
   process.exit(-1);
 });
-
 
 module.exports = pool;
