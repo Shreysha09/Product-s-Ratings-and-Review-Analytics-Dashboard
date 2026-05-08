@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "cd backend && npm install",
-    "start": "nodemon backend/src/index.js",
+    "start": "node backend/src/index.js",
     "postinstall": "npm run build"
   },
   "engines": {
