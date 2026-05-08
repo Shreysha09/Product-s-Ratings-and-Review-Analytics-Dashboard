@@ -15,6 +15,7 @@ app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -24,37 +25,47 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// API Routes
 app.use('/api', uploadRoutes);
 app.use('/api', productRoutes);
 app.use('/api', reviewRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Error handling middleware
+// ============================
+// React Frontend Build Setup
+// ============================
+
+const frontendPath = path.join(__dirname, '../../frontend/build');
+app.use(express.static(frontendPath));
+
+// React routes handling
+app.get((req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
+// ============================
+// Error Handling
+// ============================
+
+// Error middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
-  res.status(500).json({ error: 'Something went wrong!', message: err.message });
+
+  res.status(500).json({
+    error: 'Something went wrong!',
+    message: err.message
+  });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/api/health`);
 });
-
-
-if (process.env.NODE_ENV === 'production' || process.env.SERVE_FRONTEND === 'true') {
-  const frontendPath = path.join(__dirname, '../../frontend/build');
-  app.use(express.static(frontendPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-}
