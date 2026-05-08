@@ -4,7 +4,6 @@
     "buildCommand": "cd backend && npm install && cd ../frontend && npm install && npm run build"
   },
   "deploy": {
-    "runtime": "node",
     "numReplicas": 1,
     "startCommand": "cd backend && node src/index.js",
     "restartPolicyType": "ON_FAILURE",
