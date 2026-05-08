@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "cd backend && npm install && cd ../frontend && npm install && npm run build"
+  },
+  "start": {
+    "startCommand": "cd backend && node src/index.js"
+  }
+}
